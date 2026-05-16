@@ -68,6 +68,9 @@ python games/Rock-Paper-Scissor/Rock-Paper-Scissor.py
 
 ## 🙌 Contributors
 
+- Vinanthi07
+
+
 - Ranjanmaiti6
 
 
