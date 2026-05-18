@@ -1344,7 +1344,7 @@ body {
     padding: 12px 20px;
     border-radius: 999px; /* fully rounded */
     backdrop-filter: blur(10px);
-    border: 1px solid rgba(255,255,255,0.15);
+    border: 2px solid rgba(21, 194, 62, 0.721);
     width: 420px; /* increased width */
     transition: all 0.3s ease;
 }
@@ -1377,7 +1377,7 @@ body {
 /* LIGHT MODE */
 [data-theme="light"] .search-box {
     background: rgba(0, 0, 0, 0.08);
-    border: 1px solid rgba(0, 0, 0, 0.12);
+    border: 2px solid rgba(21, 194, 62, 0.721);
 }
 
 [data-theme="light"] .search-box i {
