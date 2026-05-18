@@ -84,8 +84,13 @@ def main():
         print(share_text)
         print("=" * 50)
 
-        choice = input("\nDo you want to play again? (y/n): ").lower().strip()
-        if choice != 'y':
+        while True:
+            choice = input("\nDo you want to play again? (y/n): ").lower().strip()
+            if choice in ('y', 'n'):
+                break
+            print("Invalid choice. Please enter 'y' or 'n'.")
+
+        if choice == 'n':
             print("\nThanks for playing FLAMES! Goodbye! 👋")
             break
 
