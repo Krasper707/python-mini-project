@@ -3552,6 +3552,7 @@ function initTowerOfHanoi() {
 
     return projects[projectName] || '<h2>Project Coming Soon!</h2>';
 }
+}
 
 function getTicTacToeHTML() {
     return `
