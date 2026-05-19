@@ -609,29 +609,20 @@
     </div>
 </div>
 
-    <main id="main-content" tabindex="-1">
-        <!-- Hero Section -->
-        <section class="hero-section" aria-label="Welcome">
-            <div class="hero-background color-bends-container" aria-hidden="true"></div>
-            <div class="hero-code-snippets" aria-hidden="true">
-                <span class="code-snippet snippet-one">score += 1</span>
-                <span class="code-snippet snippet-two">if guess == word:</span>
-                <span class="code-snippet snippet-three">print("You win!")</span>
-                <span class="code-snippet snippet-four">while lives &gt; 0:</span>
-                <span class="code-snippet snippet-five">roll = randint(1, 6)</span>
-                <span class="code-snippet snippet-six">moves.append(player)</span>
-                <span class="code-snippet snippet-seven">return is_prime(n)</span>
-            </div>
-            <div class="container">
-                <div class="hero-content">
-                    <p class="hero-kicker">interactive python lab</p>
-                    <h2 class="hero-title">Learn Python the Fun Way!</h2>
-                    <p class="hero-subtitle">Small browser experiments for games, math, utilities, and terminal-style practice.</p>
-                    <div class="hero-meta" aria-label="Project summary">
-                        <span id="projectCountBadge">25+ projects</span>
-                        <span>zero setup</span>
-                        <span>beginner friendly</span>
-                    </div>
+                <div class="project-card" data-category="games" data-project="blackjack(21)">
+                    <div class="card-icon">🃏</div>
+                    <h3>BlackJack21</h3>
+                    <p>Beat the dealer!</p>
+                    <button class="btn-play">Play Now</button>
+                </div>
+
+                <div class="project-card" data-category="games" data-project="number-guessing">
+                    <div class="card-icon">🎯</div>
+                    <h3>Number Guessing</h3>
+                    <p>Guess the secret number!</p>
+                    <button class="btn-play">Play Now</button>
+                </div>
+                
 
                     <div class="hero-features" role="tablist" aria-label="Project categories">
                         <button class="feature-badge tab active" data-category="all"
@@ -675,10 +666,14 @@
             </div>
         </section>
 
-        <!-- ── Projects Grid ──────────────────────────────────────── -->
-        <section class="projects-section" aria-label="Projects">
-            <div class="container">
-                <div class="projects-grid" id="projectsGrid">
+
+                <!-- Math Tools -->
+                <div class="project-card" data-category="math" data-project="fibonacci">
+                    <div class="card-icon">✨</div>
+                    <h3>Fibonacci Series</h3>
+                    <p>Generate Fibonacci sequences!</p>
+                    <button class="btn-play">Try It</button>
+                </div>
 
                     <!-- GAMES -->
                     <div class="project-card" data-category="games" data-project="rock-paper-scissor"
