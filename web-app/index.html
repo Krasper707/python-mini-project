@@ -176,11 +176,23 @@
         }
 
         /* ── Two-column editor / console layout ─────────────────────── */
+        :root {
+            --pg-footer-space: 6rem; /* reserve space for fixed footer */
+            --pg-controls-height: 88px; /* controls + header space buffer */
+        }
+
         .playground-body {
             display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 1.5rem;
-            margin-bottom: 1.5rem;
+            grid-template-columns: minmax(360px, 1fr) minmax(360px, 1fr);
+            gap: 1rem 1.5rem;
+            margin-bottom: 1rem;
+            align-items: start; /* align panels to the top to avoid uneven stretching */
+        }
+
+        @media (max-width: 1100px) {
+            .playground-body {
+                grid-template-columns: 1fr 1fr;
+            }
         }
 
         @media (max-width: 768px) {
@@ -199,6 +211,8 @@
             border-radius: 16px;
             overflow: hidden;
             transition: border-color 0.25s ease;
+            /* cap panel height so content stays inside the viewport */
+            max-height: calc(100vh - var(--pg-controls-height) - var(--pg-footer-space));
         }
 
         .editor-panel:focus-within {
@@ -255,17 +269,20 @@
 
         /* ── Code textarea ──────────────────────────────────────────── */
         #pythonEditor {
-            flex: 1;
-            min-height: 320px;
-            background: transparent;
+            flex: 1 1 auto;
+            min-height: 180px;
+            max-height: calc(100vh - var(--pg-controls-height) - var(--pg-footer-space) - 72px);
+            overflow: auto;
+            background: var(--panel-color);
             border: none;
             outline: none;
             resize: vertical;
             color: var(--text-color);
+            caret-color: var(--accent-color);
             font-family: 'Cascadia Code', 'Fira Code', 'Consolas', 'Courier New', monospace;
             font-size: 0.95rem;
             line-height: 1.65;
-            padding: 1.25rem;
+            padding: 1rem 1.25rem;
             tab-size: 4;
         }
 
@@ -276,9 +293,10 @@
 
         /* ── Console output ─────────────────────────────────────────── */
         .console-output {
-            flex: 1;
-            min-height: 320px;
-            padding: 1.25rem;
+            flex: 1 1 auto;
+            min-height: 180px;
+            max-height: calc(100vh - var(--pg-controls-height) - var(--pg-footer-space) - 72px);
+            padding: 1rem 1.25rem;
             margin: 0;
             font-family: 'Cascadia Code', 'Fira Code', 'Consolas', 'Courier New', monospace;
             font-size: 0.9rem;
@@ -1030,40 +1048,53 @@
 
         <section class="playground-section" id="playgroundSection" aria-label="Python Playground">
             <div class="container">
-                <div class="playground-header">
-                    <div class="playground-title-row">
-                        <h2 class="playground-title">🐍 Python Playground</h2>
-                        <div class="playground-status" id="playgroundStatus" aria-live="polite">
-                            <span class="status-dot" id="statusDot"></span><span id="statusText">Open tab to load Python</span>
-                        </div>
-                    </div>
-                    <p class="playground-subtitle">Write and run real Python code in your browser — powered by <a href="https://pyodide.org" target="_blank" rel="noopener noreferrer">Pyodide</a>.</p>
-                </div>
-
-                <div class="playground-body">
-                    <div class="editor-panel">
-                        <div class="panel-header">
-                            <span><i class="fas fa-code"></i> Code Editor</span>
-                            <div class="editor-actions">
-                                <button type="button" class="btn-panel-action" id="loadExample"><i class="fas fa-lightbulb"></i> Example</button>
-                                <button type="button" class="btn-panel-action" id="clearEditor"><i class="fas fa-trash-alt"></i> Clear</button>
+                <div class="playground-card" role="region" aria-labelledby="playgroundTitle">
+                    <header class="playground-card-header">
+                        <div class="title-wrap">
+                            <div>
+                                <h2 id="playgroundTitle">🐍 Interactive Python Playground</h2>
+                                <p style="margin-top:4px;">Write and execute Python code instantly — powered by <a href="https://pyodide.org" target="_blank" rel="noopener noreferrer">Pyodide</a>.</p>
                             </div>
+                            <span class="playground-badge">Python</span>
                         </div>
-                        <textarea id="pythonEditor" spellcheck="false" placeholder="# Write your Python code here…&#10;print('Hello, World!')"></textarea>
+                        <div style="display:flex; align-items:center; gap:0.6rem;">
+                            <div class="status-dot idle" id="statusDot" aria-hidden="true"></div>
+                            <div id="statusText" style="color:var(--text-secondary); font-weight:600; font-size:0.95rem;">Open the tab to load Python</div>
+                        </div>
+                    </header>
+
+                    <div class="playground-card-body">
+                        <section class="editor-card" aria-label="Code editor">
+                            <div class="card-header">
+                                <div class="card-title"><span class="dot"></span><span>Code Editor</span></div>
+                                <div class="editor-actions">
+                                    <button type="button" class="btn-panel-action" id="loadExample"><i class="fas fa-lightbulb"></i> Example</button>
+                                    <button type="button" class="btn-panel-action" id="clearEditor"><i class="fas fa-trash-alt"></i> Clear</button>
+                                </div>
+                            </div>
+                            <div class="editor-body">
+                                <textarea id="pythonEditor" spellcheck="false" placeholder="# Write your Python code here…\nprint('Hello, World!')"></textarea>
+                            </div>
+                        </section>
+
+                        <section class="console-card" aria-label="Output console">
+                            <div class="card-header">
+                                <div class="card-title"><i class="fas fa-terminal"></i><span style="margin-left:8px;">Output Console</span></div>
+                                <div>
+                                    <button type="button" class="btn-panel-action" id="clearConsole"><i class="fas fa-times-circle"></i> Clear</button>
+                                </div>
+                            </div>
+                            <div class="console-body">
+                                <pre id="consoleOutput" class="console-output"></pre>
+                            </div>
+                        </section>
                     </div>
 
-                    <div class="console-panel">
-                        <div class="panel-header">
-                            <span><i class="fas fa-terminal"></i> Output Console</span>
-                            <button type="button" class="btn-panel-action" id="clearConsole"><i class="fas fa-times-circle"></i> Clear</button>
-                        </div>
-                        <pre id="consoleOutput" class="console-output"></pre>
-                    </div>
-                </div>
-
-                <div class="playground-controls">
-                    <button type="button" class="btn-run" id="runCode" disabled><i class="fas fa-play"></i> Run Code</button>
-                    <button type="button" class="btn-stop" id="stopCode" disabled><i class="fas fa-stop"></i> Stop Execution</button>
+                    <footer class="playground-card-footer">
+                        <button type="button" class="btn-run" id="runCode" disabled><i class="fas fa-play"></i> Run Code</button>
+                        <button type="button" class="btn-stop" id="stopCode" disabled><i class="fas fa-stop"></i> Stop Execution</button>
+                        <div style="margin-left:12px; color:var(--text-secondary);">Tip: Press <kbd>Ctrl/Cmd</kbd> + <kbd>Enter</kbd> to run</div>
+                    </footer>
                 </div>
             </div>
         </section>
