@@ -714,11 +714,16 @@ if (stickyFilterBar && heroSection) {
             matches.slice(0, 8).forEach(function (project, index) {
                 var item = document.createElement('div');
                 item.className = 'dropdown-item' + (index === selectedSuggestionIndex ? ' selected' : '');
-                var iconEl = project.card.querySelector('.card-icon');
-                var iconText = iconEl ? iconEl.textContent : '';
+                var bannerEl = project.card.querySelector('.card-banner');
                 var iconBox = document.createElement('div');
                 iconBox.className = 'dropdown-item-icon';
-                iconBox.textContent = iconText;
+                if (bannerEl) {
+                    var img = document.createElement('img');
+                    img.src = bannerEl.src;
+                    img.alt = '';
+                    img.style.cssText = 'width:24px;height:24px;border-radius:4px;object-fit:cover';
+                    iconBox.appendChild(img);
+                }
 
                 var titleBox = document.createElement('div');
                 titleBox.className = 'dropdown-item-text';
@@ -1050,7 +1055,12 @@ if (stickyFilterBar && heroSection) {
             }
             localStorage.setItem('favorites', JSON.stringify(favs));
         });
-        card.appendChild(favBtn);
+        var cardActions = card.querySelector('.card-actions');
+        if (cardActions) {
+            cardActions.appendChild(favBtn);
+        } else {
+            card.appendChild(favBtn);
+        }
 
         var play = card.querySelector('.btn-play');
         if (play) {
@@ -1202,7 +1212,12 @@ projectCards.forEach(function (card) {
         });
     });
 
-    card.appendChild(shareBtn);
+    var cardActions = card.querySelector('.card-actions');
+    if (cardActions) {
+        cardActions.appendChild(shareBtn);
+    } else {
+        card.appendChild(shareBtn);
+    }
 });
 
 // 2. Toast notification helper
