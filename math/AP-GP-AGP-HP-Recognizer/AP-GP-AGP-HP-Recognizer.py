@@ -95,9 +95,17 @@ def agp_candidates(sequence):
 
 def check_agp(sequence):
     for ratio in agp_candidates(sequence):
+        a = sequence[0]
+        if is_close(ratio, 0.0):
+            # If common ratio r = 0, all terms from index 1 onwards must be 0
+            if all(is_close(x, 0.0) for x in sequence[1:]):
+                return True, ratio
+            continue
+
+        d = (sequence[1] / ratio) - a
         valid = True
-        for i in range(2, len(sequence)):
-            expected = 2 * ratio * sequence[i - 1] - (ratio * ratio) * sequence[i - 2]
+        for i in range(len(sequence)):
+            expected = (a + i * d) * (ratio ** i)
             if not is_close(sequence[i], expected, eps=1e-7):
                 valid = False
                 break
