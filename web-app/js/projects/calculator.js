@@ -140,7 +140,7 @@ function initCalculator() {
     function safeEval(expr) {
         try {
             if (!expr) return "";
-            let result = eval(format(expr));
+            let result = Function('"use strict"; return (' + format(expr) + ')')();
             if (result === undefined) return "";
             if (isNaN(result)) return "Error";
             return String(result);
@@ -170,7 +170,7 @@ function initCalculator() {
 
  
     function clearIfFinished() {
-        if (expression === "Error" || expression === "NaN") {
+        if (expression === "Error" || expression === "NaN" || expression === "Infinity" || expression === "-Infinity") {
             expression = "";
         }
     }
