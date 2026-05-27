@@ -1,147 +1,102 @@
 print("=" * 50)
-print("PRIME NUMBER GENERATOR & ANALYZER")
+print("🔢 PRIME NUMBER GENERATOR & ANALYZER 🔢")
 print("=" * 50)
-
+print("📝 Analyze, generate, and factorize prime numbers efficiently.")
+import math
 while True:
-    print("\nChoose an option:")
-    print("1. Check if a number is prime")
-    print("2. Generate prime numbers up to N")
-    print("3. Find primes in a range")
-    print("4. Prime factorization")
-    print("5. Find the Nth prime number")
-    print("6. Exit")
+    print("\n" + "—" * 50)
+    print("📋 MAIN MENU")
+    print("1️⃣  Check if a number is prime")
+    print("2️⃣  Generate prime numbers up to N")
+    print("3️⃣  Find primes in a range")
+    print("4️⃣  Prime factorization")
+    print("5️⃣  Find the Nth prime number")
+    print("6️⃣  Exit")
 
-    choice = input("\nEnter your choice (1-6): ")
+
+    choice = input("\n🎯 Enter your choice (1-6): ").strip()
 
     if choice == '1':
-        print("\n" + "-" * 50)
-        print("CHECK IF A NUMBER IS PRIME")
-        print("-" * 50)
-        
+        print("🔍CHECK IF A NUMBER IS PRIME")        
         try:
-            is_prime = True
-            num = int(input("Enter a number: "))
-            
-            if num < 2:
-                print(f"\n{num} is NOT a prime number.")
-                print("(Prime numbers must be greater than 1)")
+            num=int(input("🎯 Enter a number to check: "))
+            if num<2:
+                print(f"😔 {num} is NOT a prime number. (Primes must be > 1)")
             else:
-                if num == 2:
-                    is_prime = True
-                elif num % 2 == 0:
+                is_prime=True
+                if num > 2 and num % 2 == 0:
                     is_prime = False
                 else:
-                    i = 3
-                    while i * i <= num:
+                    for i in range(3, int(math.sqrt(num)) + 1, 2):
                         if num % i == 0:
                             is_prime = False
                             break
-                        i += 2
                 if is_prime:
-                    print(f"\n{num} is a prime number.")
+                    print(f"✅ {num} is a prime number!")
                 else:
-                    print(f"\n{num} is NOT a prime number.")
-        
+                    print(f"😔 {num} is NOT a prime number.")
         except ValueError:
-            print("Please enter a valid number!")
-    
+            print("❌ Error: Please enter a valid integer.")
+
     elif choice == '2':
-        print("\n" + "-" * 50)
-        print("GENERATE PRIME NUMBERS UP TO N")
-        print("-" * 50)
+        print("\n🔢 GENERATE PRIME NUMBERS UP TO N")
         
         try:
-            limit = int(input("Enter the limit (N): "))
-            
+            limit = int(input("🎯 Enter the limit (N): "))
+            if limit > 10000000:
+                print("❌ Error: Limit is too high for this system's memory.")
+
             if limit < 2:
-                print("\nNo prime numbers exist below 2.")
+                print("⚠️ No prime numbers exist below 2.")
+            
             else:
-                prime = [True] * (limit + 1)
-                prime[0] = prime[1] = False
+                sieve = [True] * (limit + 1)
+                sieve[0] = sieve[1] = False
+                for p in range(2, int(math.sqrt(limit)) + 1):
+                    if sieve[p]:
+                        for i in range(p * p, limit + 1, p):
+                            sieve[i] = False
+                primes = [i for i, is_p in enumerate(sieve) if is_p]
+                print(f"✅ Primes up to {limit}: {primes}")
+                print(f"📊 Total count: {len(primes)}")
 
-                p = 2
-
-                while p * p <= limit:
-                    if prime[p]:
-                        multiple = p * p
-
-                        while multiple <= limit:
-                            prime[multiple] = False
-                            multiple += p
-                    p += 1
-                primes = []
-                for num in range(2, limit + 1):
-                    if prime[num]:
-                        primes.append(num)
-                
-                print(f"\nPrime numbers up to {limit}:")
-                print(primes)
-                print(f"\nTotal prime numbers: {len(primes)}")
-                
-                if len(primes) > 0:
-                    print(f"Smallest prime: {primes[0]}")
-                    print(f"Largest prime: {primes[-1]}")
-        
         except ValueError:
-            print("Please enter a valid number!")
+            print("❌ Error: Please enter a valid integer!")
     
     elif choice == '3':
-        print("\n" + "-" * 50)
-        print("FIND PRIMES IN A RANGE")
-        print("-" * 50)
+        print("\n📍FIND PRIMES IN A RANGE")
         
         try:
-            start = int(input("Enter start of range: "))
-            end = int(input("Enter end of range: "))
+            start = int(input("🎯 Enter start of range: "))
+            end = int(input("🎯 Enter end of range: "))
             
             if start > end:
-                print("\nError: Start must be less than or equal to end!")
+                print("❌ Error: Start must be less than or equal to end!")
             elif end < 2:
-                print("\nNo prime numbers exist below 2.")
+                print("❌ No prime numbers exist below 2.")
             else:
-                if start < 2:
-                    start = 2
-                
-                prime = [True] * (end + 1)
-                prime[0] = prime[1] = False
-
-                p = 2
-
-                while p * p <= end:
-                    if prime[p]:
-                        multiple = p * p
-
-                        while multiple <= end:
-                            prime[multiple] = False
-                            multiple += p
-                    p += 1
-
-                primes = []
-
-                for num in range(start, end + 1):
-                    if prime[num]:
-                        primes.append(num)
-                
-                print(f"\nPrime numbers between {start} and {end}:")
-                if len(primes) == 0:
-                    print("No prime numbers found in this range.")
-                else:
-                    print(primes)
-                    print(f"\nTotal prime numbers: {len(primes)}")
+                current_start = max(2, start)
+                sieve = [True] * (end + 1)
+                sieve[0] = sieve[1] = False
+                for p in range(2, int(math.sqrt(end)) + 1):
+                    if sieve[p]:
+                        for i in range(p * p, end + 1, p):
+                            sieve[i] = False
+                primes = [i for i in range(current_start, end + 1) if sieve[i]]
+                print(f"✅ Primes between {start} and {end}: {primes}")
         
         except ValueError:
-            print("Please enter valid numbers!")
+            print("❌ Error:Please enter valid numbers!")
     
     elif choice == '4':
-        print("\n" + "-" * 50)
-        print("PRIME FACTORIZATION")
-        print("-" * 50)
+        print("\n🏗️ PRIME FACTORIZATION")
+
         
         try:
-            num = int(input("Enter a number: "))
+            num = int(input("🎯 Enter a number: "))
             
             if num < 2:
-                print(f"\n{num} cannot be factorized into primes.")
+                print(f"⚠️ {num} cannot be factorized into primes.")
             else:
                 original_num = num
                 factors = []
@@ -156,71 +111,70 @@ while True:
                 if num > 1:
                     factors.append(num)
                 
-                print(f"\nPrime factorization of {original_num}:")
-                print(f"{original_num} = {' × '.join(map(str, factors))}")
-                
-                unique_factors = []
-                for factor in factors:
-                    if factor not in unique_factors:
-                        unique_factors.append(factor)
-                
-                print(f"\nUnique prime factors: {unique_factors}")
-                print(f"Total prime factors (with repetition): {len(factors)}")
+                result_str = " × ".join(map(str, factors))
+                print(f"✅ Factorization: {original_num} = {result_str}")
         
         except ValueError:
-            print("Please enter a valid number!")
+            print("❌ Error:Please enter a valid number!")
     
     elif choice == '5':
-        print("\n" + "-" * 50)
-        print("FIND THE NTH PRIME NUMBER")
-        print("-" * 50)
+        print("\n🏆 FIND THE NTH PRIME NUMBER")
         
         try:
-            n = int(input("Enter the value of n: "))
-            
-            if n <= 0:
-                print("\nPlease enter a positive number!")
+            n = int(input("🎯 Enter the value of n: "))
+            if n > 1000000:
+                print("❌ Error: n is too large. High-range Nth primes require a Segmented Sieve.")
+
+            elif n <= 0:
+                print("❌ Please enter a positive number!")
+            elif n==1:
+                print("The First Prime Number is: 2")
             else:
                 limit = 100
+                if n < 6:
+                    limit = 15 # Smallest limit for tiny N
+                else:
+                    # Formula: n * (log n + log(log n))
+                    log_n = math.log(n)
+                    limit = int(n * (log_n + math.log(log_n))) + 10 # Buffer of 10
+                
+                # Sieve of Eratosthenes (Optimized)
+                prime = [True] * (limit + 1)
+                prime[0] = prime[1] = False
+                p = 2
+                while p * p <= limit:
+                    if prime[p]:
+                        for i in range(p * p, limit + 1, p):
+                            prime[i] = False
+                    p += 1
+                count = 0
+                nth_prime = None
+                for i in range(2, limit + 1):
+                    if prime[i]:
+                        count += 1
+                        if count == n:
+                            nth_prime = i
+                            break
 
-                while True:
-                    prime = [True] * (limit + 1)
-                    prime[0] = prime[1] = False
-
-                    p = 2
-
-                    while p * p <= limit:
-                        if prime[p]:
-                            multiple = p * p
-
-                            while multiple <= limit:
-                                prime[multiple] = False
-                                multiple += p
-
-                        p += 1
-
-                    primes = []
-
-                    for num in range(2, limit + 1):
-                        if prime[num]:
-                            primes.append(num)
-
-                    if len(primes) >= n:
-                        print(f"\nThe {n}th prime number is: {primes[n - 1]}")
-                        break
-
-                    limit *= 2
+                # If our estimate was somehow too low, we handle it (Safety fallback)
+                if nth_prime:
+                    print(f"🎉 The {n}th prime number is: {nth_prime}")
+                else:
+                    # This branch is now technically impossible due to the +10 buffer
+                    print("❌ Error: Calculation range exceeded.")
         
         except ValueError:
             print("Please enter a valid number!")
     
     elif choice == '6':
-        print("\n" + "=" * 50)
-        print("Thank you for using Prime Number Analyzer!")
-        print("=" * 50)
+        print("\n👋Thank you for using Prime Number Analyzer!")
         break
     
     else:
-        print("\nInvalid choice! Please enter a number between 1 and 6.")
+        print("\n ❌ Invalid choice! Please enter a number between 1 and 6.")
     
-    print("\n" + "=" * 50)
+    again = input("\n🔄 Return to main menu? (y/n): ").strip().lower()
+    if again != 'y':
+        print("\n👋 Goodbye!\n")
+        break
+
