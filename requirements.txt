@@ -1,5 +1,14 @@
-# Core dependencies for the project collection, tests, and banner generation
+# Game dependencies
+pygame
+
+# Math dependencies
 numpy
 matplotlib
-Pillow
+pillow
+
+# Test dependencies
 pytest>=9.0.3
+
+# Utilities dependencies
+nltk
+requests
