@@ -2741,24 +2741,56 @@ body.sidebar-active .hero-controls {
   color: var(--accent);
 }
 
+/* ── CodeMirror 6 Editor Container ─────────────────────────── */
 #pythonEditor {
   flex: 1;
   min-height: 280px;
-  background: transparent;
-  border: none;
-  outline: none;
-  resize: vertical;
-  color: var(--text);
-  font-family: var(--font-mono);
-  font-size: 0.85rem;
-  line-height: 1.7;
-  padding: 16px;
-  tab-size: 4;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
 }
 
-#pythonEditor::placeholder {
-  color: var(--text-tertiary);
-  opacity: 0.6;
+/* The CM editor root fills the container */
+#pythonEditor .cm-editor {
+  flex: 1;
+  height: 100%;
+  min-height: 280px;
+  outline: none;
+}
+
+/* Scroller takes full height */
+#pythonEditor .cm-scroller {
+  flex: 1;
+  overflow: auto;
+  min-height: 280px;
+  font-family: var(--font-mono);
+  font-size: 0.875rem;
+  line-height: 1.7;
+}
+
+/* Remove default CM focus ring — editor-panel provides its own */
+#pythonEditor .cm-editor.cm-focused {
+  outline: none;
+}
+
+/* Trigger the panel's accent border when CM is focused */
+.editor-panel:has(.cm-editor.cm-focused) {
+  border-color: var(--accent);
+}
+
+/* Fallback for browsers without :has (Firefox < 121) */
+.editor-panel:focus-within {
+  border-color: var(--accent);
+}
+
+/* Light mode: slightly tinted gutter background */
+[data-theme='light'] #pythonEditor .cm-gutters {
+  background: rgba(0,0,0,0.03);
+}
+
+/* Smooth theme transition */
+#pythonEditor .cm-editor {
+  transition: background-color var(--duration-base) ease;
 }
 
 .console-output {
