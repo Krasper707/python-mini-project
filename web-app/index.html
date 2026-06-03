@@ -54,8 +54,8 @@
 <i class="fas fa-search"></i>
 <input aria-label="Search projects" id="navSearchInput" placeholder="Search projects or games..." type="text"/>
 </div>
-<!-- HAMBURGER TOGGLE (mobile) -->
-<button type="button" class="mobile-menu-toggle" id="mobileMenuToggle" aria-label="Toggle navigation menu" aria-expanded="false">
+<!-- HAMBURGER — toggles sidebar -->
+<button type="button" class="mobile-menu-toggle" id="mobileMenuToggle" aria-label="Toggle sidebar" aria-expanded="true" onclick="(function(b){var open=b.classList.toggle('sidebar-active');document.getElementById('mobileMenuToggle').setAttribute('aria-expanded',String(open));})(document.body)">
 <i class="fas fa-bars"></i>
 </button>
 <!-- RIGHT -->
@@ -823,7 +823,62 @@
 <script src="js/main.js"></script>
 <script src="js/hero-canvas.js"></script>
 <script>lucide.createIcons();</script>
-<script src="js/fix.js"></script> 
+<script src="js/fix.js"></script>
+<script>
+/* ── FIX 2: Keep sidebar open when clicking project cards or modal content ──
+   main.js registers a document-level click listener that removes sidebar-active
+   for "click outside" — we stop propagation on the project grid and modal so
+   those clicks never reach that handler.                                      */
+(function () {
+  function guardSidebar() {
+    /* Elements whose clicks must NOT close the sidebar */
+    var guards = [
+      '#projectsSection',   /* entire projects grid area */
+      '#projectsGrid',
+      '.project-card',
+      '.btn-play',
+      '.modal',             /* project modal */
+      '#projectModal',
+      '.modal-content',
+      '#modalBody',
+      '.playground-section',
+      '.playground-body',
+    ];
+    guards.forEach(function (sel) {
+      document.querySelectorAll(sel).forEach(function (el) {
+        el.addEventListener('click', function (e) {
+          /* Only block propagation if sidebar is currently open */
+          if (document.body.classList.contains('sidebar-active')) {
+            e.stopPropagation();
+          }
+        }, true /* capture — runs before main.js bubble handler */);
+      });
+    });
+
+    /* Also re-guard whenever new cards are injected (dynamic render) */
+    var observer = new MutationObserver(function () {
+      guards.forEach(function (sel) {
+        document.querySelectorAll(sel).forEach(function (el) {
+          if (el._sidebarGuarded) return;
+          el._sidebarGuarded = true;
+          el.addEventListener('click', function (e) {
+            if (document.body.classList.contains('sidebar-active')) {
+              e.stopPropagation();
+            }
+          }, true);
+        });
+      });
+    });
+    observer.observe(document.body, { childList: true, subtree: true });
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', guardSidebar, { once: true });
+  } else {
+    guardSidebar();
+  }
+})();
+</script> 
 <script>
 (function () {
   var projectAliases = {
