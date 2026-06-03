@@ -2608,6 +2608,23 @@ body.sidebar-active .sidebar-dock {
   gap: 6px;
 }
 
+.draft-selector {
+  background: var(--bg-glass);
+  border: 1px solid var(--border);
+  color: var(--text-secondary);
+  padding: 6px 10px;
+  border-radius: 8px;
+  font-size: 0.75rem;
+}
+
+.draft-status {
+  padding: 8px 12px;
+  border-top: 1px solid var(--border);
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  background: var(--bg-glass);
+}
+
 .btn-panel-action {
   background: var(--bg-glass);
   border: 1px solid var(--border);

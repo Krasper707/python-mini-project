@@ -39,6 +39,8 @@
     var EXECUTION_TIMEOUT_MS = 5000;  // 5 seconds timeout
     var currentTimeoutId = null;
     var WORKER_SCRIPT = 'js/playground-worker.js';
+    var DRAFTS_STORAGE_KEY = 'playground_drafts';
+    var ACTIVE_DRAFT_KEY   = 'playground_active_draft';
 
     /* ================================================================
        3.  EXAMPLE CODE SNIPPETS
@@ -127,6 +129,11 @@
     var clearConsoleBtn   = $id('clearConsole');
     var clearEditorBtn    = $id('clearEditor');
     var loadExampleBtn    = $id('loadExample');
+    var draftSelector     = $id('draftSelector');
+    var saveDraftBtn      = $id('saveDraft');
+    var loadDraftBtn      = $id('loadDraft');
+    var deleteDraftBtn    = $id('deleteDraft');
+    var draftStatus       = $id('draftStatus');
 
     /* Guard – abort gracefully if playground HTML is absent */
     if (!playgroundSection || !runBtn || !stopBtn || !editorMount || !consoleEl) {
@@ -518,6 +525,47 @@
     });
     themeObserver.observe(document.documentElement, { attributes: true });
 
+    function getDrafts() {
+        try {
+            var data = localStorage.getItem(DRAFTS_STORAGE_KEY);
+            return data ? JSON.parse(data) : {};
+        } catch (e) {
+            return {};
+        }
+    }
+
+    function saveDrafts(drafts) {
+        try {
+            localStorage.setItem(DRAFTS_STORAGE_KEY, JSON.stringify(drafts));
+        } catch (e) {
+            console.error('Failed to save drafts:', e);
+        }
+    }
+
+    function setDraftStatus(message) {
+        if (!draftStatus) return;
+
+        draftStatus.textContent = message;
+    }
+
+    function refreshDraftSelector() {
+        if (!draftSelector) return;
+
+        var drafts = getDrafts();
+
+        draftSelector.innerHTML =
+            '<option value="">Select Draft</option>';
+
+        Object.keys(drafts)
+            .sort()
+            .forEach(function(name) {
+                var option = document.createElement('option');
+                option.value = name;
+                option.textContent = name;
+                draftSelector.appendChild(option);
+            });
+    }
+
     /* ================================================================
        6.  UI HELPER FUNCTIONS
     ================================================================ */
@@ -718,6 +766,13 @@
 
     if (clearEditorBtn) {
         clearEditorBtn.addEventListener('click', function () {
+            if (
+                !confirm(
+                    'Clear editor contents? Unsaved changes will be lost.'
+                )
+            ) {
+                return;
+            }
             setCode('');
             if (cmView) cmView.focus();
         });
@@ -728,6 +783,122 @@
             setCode(EXAMPLES[exampleIdx % EXAMPLES.length]);
             exampleIdx++;
             if (cmView) cmView.focus();
+        });
+    }
+
+    if (saveDraftBtn) {
+        saveDraftBtn.addEventListener('click', function() {
+
+            var draftName = prompt(
+                'Enter a name for this draft:'
+            );
+
+            if (!draftName) return;
+
+            draftName = draftName.trim();
+
+            if (!draftName) return;
+
+            var drafts = getDrafts();
+
+            drafts[draftName] = {
+                code: getCode(),
+                updatedAt: new Date().toISOString()
+            };
+
+            saveDrafts(drafts);
+
+            try {
+                localStorage.setItem(ACTIVE_DRAFT_KEY, draftName);
+            } catch (e) {
+                console.error('Failed to save active draft:', e);
+            }
+
+            refreshDraftSelector();
+
+            draftSelector.value = draftName;
+
+            setDraftStatus(
+                'Draft "' + draftName + '" saved'
+            );
+        });
+    }
+
+    if (loadDraftBtn) {
+        loadDraftBtn.addEventListener('click', function() {
+
+            var selectedDraft = draftSelector.value;
+
+            if (!selectedDraft) {
+                setDraftStatus('Select a draft first');
+                return;
+            }
+
+            var drafts = getDrafts();
+
+            if (!drafts[selectedDraft]) {
+                setDraftStatus('Draft not found');
+                return;
+            }
+
+            setCode(
+                drafts[selectedDraft].code || ''
+            );
+
+            try {
+                localStorage.setItem(ACTIVE_DRAFT_KEY, selectedDraft);
+            } catch (e) {
+                console.error('Failed to save active draft:', e);
+            }
+
+            setDraftStatus(
+                'Loaded draft "' +
+                selectedDraft +
+                '"'
+            );
+        });
+    }
+
+    if (deleteDraftBtn) {
+        deleteDraftBtn.addEventListener('click', function() {
+
+            var selectedDraft = draftSelector.value;
+
+            if (!selectedDraft) {
+                setDraftStatus('Select a draft first');
+                return;
+            }
+
+            var confirmed = confirm(
+                'Delete draft "' +
+                selectedDraft +
+                '" ?'
+            );
+
+            if (!confirmed) return;
+
+            var drafts = getDrafts();
+
+            delete drafts[selectedDraft];
+
+            saveDrafts(drafts);
+
+            try {
+                var activeDraft = localStorage.getItem(ACTIVE_DRAFT_KEY);
+                if (activeDraft === selectedDraft) {
+                    localStorage.removeItem(ACTIVE_DRAFT_KEY);
+                }
+            } catch (e) {
+                console.error('Failed to remove active draft:', e);
+            }
+
+            refreshDraftSelector();
+
+            setDraftStatus(
+                'Deleted "' +
+                selectedDraft +
+                '"'
+            );
         });
     }
 
@@ -745,5 +916,36 @@
         '# \uD83D\uDC0D Write your Python code here\u2026\n' +
         'print("Hello, World!")'
     );
+
+    /* Populate the draft selector dropdown */
+    refreshDraftSelector();
+
+    /* Restore last active draft if available */
+    try {
+        var activeDraft = localStorage.getItem(ACTIVE_DRAFT_KEY);
+
+        var drafts = getDrafts();
+
+        if (
+            activeDraft &&
+            drafts[activeDraft]
+        ) {
+
+            draftSelector.value =
+                activeDraft;
+
+            setCode(
+                drafts[activeDraft].code || ''
+            );
+
+            setDraftStatus(
+                'Restored "' +
+                activeDraft +
+                '"'
+            );
+        }
+    } catch (e) {
+        console.error('Failed to restore active draft:', e);
+    }
 
 }());

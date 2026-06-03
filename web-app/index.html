@@ -605,9 +605,39 @@
             <button class="btn-panel-action" id="clearEditor" title="Clear the editor" type="button">
               <i aria-hidden="true" class="fas fa-trash-alt"></i> Clear
             </button>
+            <select
+              id="draftSelector"
+              class="draft-selector"
+              aria-label="Select draft">
+              <option value="">Select Draft</option>
+            </select>
+
+            <button
+              id="saveDraft"
+              class="btn-panel-action"
+              type="button">
+              Save Draft
+            </button>
+
+            <button
+              id="loadDraft"
+              class="btn-panel-action"
+              type="button">
+              Load Draft
+            </button>
+
+            <button
+              id="deleteDraft"
+              class="btn-panel-action"
+              type="button">
+              Delete Draft
+            </button>
           </div>
         </div>
         <div id="pythonEditor" aria-label="Python code editor" role="textbox" aria-multiline="true"></div>
+        <div id="draftStatus" class="draft-status">
+          No draft loaded
+        </div>
       </div>
 
       <div class="console-panel">
@@ -740,6 +770,7 @@
 <script src="js/projects/color-palette.js"></script>
 <script src="js/projects/resume-analyzer.js"></script>
 <script src="js/projects.js"></script>
+<script src="js/storage.js"></script>
 <script src="js/cm-editor.js"></script>
 <script src="js/playground.js"></script>
 <script type="module" src="js/main.js"></script>
@@ -766,15 +797,21 @@
       '.playground-body',
     ];
     guards.forEach(function (sel) {
-      document.querySelectorAll(sel).forEach(function (el) {
-        el.addEventListener('click', function (e) {
-          /* Only block propagation if sidebar is currently open */
-          if (document.body.classList.contains('sidebar-active')) {
-            e.stopPropagation();
-          }
-        }, false /* bubble — runs after target target bubble handlers */);
+        document.querySelectorAll(sel).forEach(function (el) {
+          el.addEventListener('click', function (e) {
+            /* Only block propagation if sidebar is currently open */
+            if (document.body.classList.contains('sidebar-active')) {
+              e.stopPropagation();
+            }
+          }, false /* bubble — runs after target target bubble handlers */);
+        });
       });
-(function() {
+    }
+
+    guardSidebar();
+  })();
+
+  (function() {
     const projectsGrid = document.getElementById('projectsGrid');
     if (!projectsGrid) return;
     
@@ -963,7 +1000,6 @@
                     toggle.setAttribute('aria-label', 'Switch to dark mode');
                 }
             }
-          }, false);
         });
     }
     
