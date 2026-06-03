@@ -1644,4 +1644,3 @@ if (progressBar) {
 
   // Initial card filtering state update
   updateProjectVisibility(currentCategory, currentSearchQuery);
-});
