@@ -162,8 +162,6 @@ document.addEventListener("DOMContentLoaded", function () {
   window.addEventListener("load", repairLegacyHomeLayoutNow, { once: true });
 
   var html = document.documentElement;
-  var themeToggle = document.querySelector(".sidebar-dock #themeToggle");
-  var soundToggle = document.querySelector(".sidebar-dock #soundToggle");
   var backToTopButton = document.getElementById("backToTop");
   var searchInput = document.querySelector(".sidebar-dock #searchInput");
   var navSearchInput = document.getElementById("navSearchInput");
@@ -215,105 +213,53 @@ document.addEventListener("DOMContentLoaded", function () {
     });
   }
 
-  /* ── Theme Toggle ─────────────────────────────────────────── */
-  function updateThemeToggleAria(isLight) {
-    if (!themeToggle) return;
-    themeToggle.setAttribute(
-      "aria-label",
-      isLight ? "Switch to dark mode" : "Switch to light mode"
-    );
-  }
+  /* ── Sound Toggle (Multi-Element Support) ─────────────────────────── */
+  var soundToggles = document.querySelectorAll(".sound-toggle");
 
-  if (themeToggle) {
-    var savedTheme = localStorage.getItem("theme") || "dark";
-    html.setAttribute("data-theme", savedTheme);
-    syncThemeColor(savedTheme);
-    // Prefer showing a sun icon when the site is dark (site's main theme).
-    // Show sun for dark theme, moon for light theme so reload displays sun by default.
-    themeToggle.innerHTML =
-      savedTheme === "dark"
-        ? '<i class="fas fa-sun"></i>'
-        : '<i class="fas fa-moon"></i>';
-    updateThemeToggleAria(savedTheme === "light");
-
-    themeToggle.addEventListener("click", function () {
-      var current = html.getAttribute("data-theme");
-      var next = current === "light" ? "dark" : "light";
-      html.setAttribute("data-theme", next);
-      localStorage.setItem("theme", next);
-      syncThemeColor(next);
-      // After toggling, show sun when the new theme is dark, moon when it's light.
-      themeToggle.innerHTML =
-        next === "dark"
-          ? '<i class="fas fa-sun"></i>'
-          : '<i class="fas fa-moon"></i>';
-      updateThemeToggleAria(next === "light");
+  function updateSoundIcons() {
+    var isMuted = window.audioController
+      ? window.audioController.isMuted
+      : false;
+    var iconHtml = isMuted
+      ? '<i class="fas fa-volume-mute"></i>'
+      : '<i class="fas fa-volume-up"></i>';
+    soundToggles.forEach(function (btn) {
+      btn.innerHTML = iconHtml;
     });
   }
 
-  /* ── Sound Toggle ─────────────────────────────────────────── */
-  if (soundToggle && window.audioController) {
-    function updateSoundIcon() {
-      soundToggle.innerHTML = window.audioController.isMuted
-        ? '<i class="fas fa-volume-mute"></i>'
-        : '<i class="fas fa-volume-up"></i>';
-    }
-    updateSoundIcon();
-    soundToggle.addEventListener("click", function () {
-      if (typeof window.audioController.toggleMute === "function") {
-        window.audioController.toggleMute();
-        updateSoundIcon();
-        if (
-          !window.audioController.isMuted &&
-          typeof window.audioController.play === "function"
-        ) {
-          window.audioController.play("click");
+  if (window.audioController) {
+    updateSoundIcons();
+    soundToggles.forEach(function (toggle) {
+      toggle.addEventListener("click", function () {
+        if (typeof window.audioController.toggleMute === "function") {
+          window.audioController.toggleMute();
+          updateSoundIcons(); // Instantly updates every sound button on the screen
+          if (
+            !window.audioController.isMuted &&
+            typeof window.audioController.play === "function"
+          ) {
+            window.audioController.play("click");
+          }
         }
-      }
+      });
     });
-  } else if (soundToggle) {
-    soundToggle.addEventListener("click", function () {
-      var icon = soundToggle.querySelector("i");
-      if (icon)
-        icon.className =
-          icon.className === "fas fa-volume-up"
-            ? "fas fa-volume-mute"
-            : "fas fa-volume-up";
-    });
-  }
-
-  /* ── Hero Controls Mirror Toggles ─────────────────────────── */
-  var heroSoundToggle = document.getElementById("heroSoundToggle");
-  var heroThemeToggle = document.getElementById("heroThemeToggle");
-
-  function syncHeroControlsIcons() {
-    if (heroSoundToggle && soundToggle) {
-      var realSoundIcon = soundToggle.querySelector("i");
-      var heroSoundIcon = heroSoundToggle.querySelector("i");
-      if (realSoundIcon && heroSoundIcon) {
-        heroSoundIcon.className = realSoundIcon.className;
-      }
-    }
-    if (heroThemeToggle && themeToggle) {
-      var realThemeIcon = themeToggle.querySelector("i");
-      var heroThemeIcon = heroThemeToggle.querySelector("i");
-      if (realThemeIcon && heroThemeIcon) {
-        heroThemeIcon.className = realThemeIcon.className;
-      }
-    }
-  }
-
-  if (heroSoundToggle && soundToggle) {
-    heroSoundToggle.addEventListener("click", function () {
-      soundToggle.click();
-      setTimeout(syncHeroControlsIcons, 50);
-    });
-  }
-
-  if (heroThemeToggle && themeToggle) {
-    heroThemeToggle.addEventListener("click", function () {
-      themeToggle.click();
-      setTimeout(syncHeroControlsIcons, 50);
+  } else {
+    // Fallback if audioController isn't loaded
+    soundToggles.forEach(function (toggle) {
+      toggle.addEventListener("click", function () {
+        var icon = this.querySelector("i");
+        if (icon) {
+          var newClass =
+            icon.className === "fas fa-volume-up"
+              ? "fas fa-volume-mute"
+              : "fas fa-volume-up";
+          soundToggles.forEach(function (btn) {
+            var i = btn.querySelector("i");
+            if (i) i.className = newClass;
+          });
+        }
+      });
     });
   }
 
@@ -1607,47 +1553,45 @@ if (progressBar) {
     ticking = false;
   }
 
-    window.addEventListener("scroll", () => {
-      if (!ticking) {
-        requestAnimationFrame(updateScrollProgress);
-        ticking = true;
-      }
-    });
+  window.addEventListener("scroll", () => {
+    if (!ticking) {
+      requestAnimationFrame(updateScrollProgress);
+      ticking = true;
+    }
+  });
+}
+
+// URL parameters auto-open logic
+(function () {
+  const params = new URLSearchParams(window.location.search);
+  const projectParam = params.get("project");
+  if (projectParam) {
+    const match = projectCards.find(
+      (c) => c.getAttribute("data-project") === projectParam
+    );
+    if (match) {
+      setTimeout(() => {
+        openProjectSafe(projectParam, match);
+        match.scrollIntoView({ behavior: "smooth", block: "center" });
+      }, 300);
+    }
   }
-
-  // URL parameters auto-open logic
-  (function () {
-    const params = new URLSearchParams(window.location.search);
-    const projectParam = params.get("project");
-    if (projectParam) {
-      const match = projectCards.find(
-        (c) => c.getAttribute("data-project") === projectParam
-      );
-      if (match) {
-        setTimeout(() => {
-          openProjectSafe(projectParam, match);
-          match.scrollIntoView({ behavior: "smooth", block: "center" });
-        }, 300);
-      }
+  const catParam = params.get("category");
+  const valid = [
+    "all",
+    "games",
+    "math",
+    "utilities",
+    "playground",
+    "favorites",
+  ];
+  if (catParam && valid.includes(catParam)) {
+    const tab = document.querySelector(`[data-category="${catParam}"]`);
+    if (tab) {
+      setTimeout(() => tab.click(), 100);
     }
-    const catParam = params.get("category");
-    const valid = [
-      "all",
-      "games",
-      "math",
-      "utilities",
-      "playground",
-      "favorites",
-    ];
-    if (catParam && valid.includes(catParam)) {
-      const tab = document.querySelector(`[data-category="${catParam}"]`);
-      if (tab) {
-        setTimeout(() => tab.click(), 100);
-      }
-    }
-  })();
+  }
+})();
 
-  // Initial card filtering state update
-  updateProjectVisibility(currentCategory, currentSearchQuery);
-});
-
+// Initial card filtering state update
+updateProjectVisibility(currentCategory, currentSearchQuery);
