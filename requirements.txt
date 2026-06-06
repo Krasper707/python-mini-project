@@ -1,5 +1,5 @@
 # Game dependencies
-pygame==2.5.2
+pygame==2.6.1
 
 # Math dependencies
 numpy==1.26.4
