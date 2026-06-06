@@ -157,6 +157,8 @@ function setupModalInfoButton(projectName) {
 
 /* ── DOMContentLoaded ──────────────────────────────────────── */
 document.addEventListener("DOMContentLoaded", function () {
+  // Initially hide sidebar - will be shown by IntersectionObserver
+document.body.classList.remove("sidebar-active");
   function repairLegacyHomeLayoutNow() {
     var legacyHost = document.querySelector(".hero-code-snippets")
       ? document.querySelector(".hero-code-snippets").closest(".hero-section")
@@ -298,9 +300,6 @@ document.addEventListener("DOMContentLoaded", function () {
       });
     });
   }
-
-  // Initial sync on load
-  setTimeout(syncHeroControlsIcons, 100);
 
   /* ── Mobile Sidebar Toggle ──────────────────────────────── */
   var mobileSidebarToggle = document.getElementById("mobileSidebarToggle");
@@ -668,24 +667,23 @@ document.addEventListener("DOMContentLoaded", function () {
   if (stickyTabs.length) syncStickyTabs("all");
 
   /* ── Sidebar Active Scroll Observer ───────────────────────── */
-  if (!pageCategory && projectsSection) {
-    // On homepage, observe projectsSection to toggle sidebar-active class
-    var sidebarActiveObserver = new IntersectionObserver(
-      function (entries) {
-        entries.forEach(function (entry) {
-          var isVisible =
-            entry.isIntersecting || entry.boundingClientRect.top < 200;
-          document.body.classList.toggle("sidebar-active", isVisible);
-        });
-      },
-      { threshold: 0.05 }
-    );
-    sidebarActiveObserver.observe(projectsSection);
-  } else if (pageCategory) {
-    // On subpages, always ensure sidebar is active
-    document.body.classList.add("sidebar-active");
-  }
-
+if (!pageCategory && projectsSection) {
+  console.log('Setting up sidebar observer');
+  
+  const checkAndToggleSidebar = () => {
+    const rect = projectsSection.getBoundingClientRect();
+    // Show sidebar when projects section is in view AND we're scrolled past hero
+    const heroSection = document.querySelector('.hero-section');
+    const heroBottom = heroSection ? heroSection.getBoundingClientRect().bottom : 0;
+    const showSidebar = rect.top < window.innerHeight && window.scrollY > heroBottom - 100;
+    
+    document.body.classList.toggle("sidebar-active", showSidebar);
+    console.log('Sidebar active:', showSidebar, 'scrollY:', window.scrollY);
+  };
+  
+  window.addEventListener('scroll', checkAndToggleSidebar);
+  checkAndToggleSidebar();
+}
   /* ═══════════════════════════════════════════════════════════════
      SEARCH
      ═══════════════════════════════════════════════════════════════ */
@@ -1085,15 +1083,11 @@ function openProjectSafe(name, trigger) {
   safeRun(function () {
     if (typeof getProjectHTML === "function") {
       const rawHTML =
-        getProjectHTML(name) ||
-        '<div style="padding:1rem;color:var(--text-secondary)">Project content unavailable.</div>';
+      getProjectHTML(name) ||
+      '<div style="padding:1rem;color:var(--text-secondary)">Project content unavailable.</div>';
 
-      // Sanitize the HTML before it touches the DOM
-      if (window.DOMPurify) {
-        modalBody.innerHTML = DOMPurify.sanitize(rawHTML);
-      } else {
-        modalBody.textContent = "Security Error: Sanitizer failed to load.";
-      }
+      // Directly set HTML (we control the content)
+      modalBody.innerHTML = rawHTML;
     } else {
       modalBody.innerHTML =
         '<div style="padding:1rem;color:var(--text-secondary)">Project content unavailable.</div>';
@@ -1663,3 +1657,4 @@ if (progressBar) {
 
 // Initial card filtering state update
 updateProjectVisibility(currentCategory, currentSearchQuery);
+});
