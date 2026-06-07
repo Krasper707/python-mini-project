@@ -717,7 +717,10 @@ class MathQuizGUI:
         quit_btn.pack(side="left", padx=10)
 
 
-if __name__ == "__main__":
+def main():
     root = tk.Tk()
     app = MathQuizGUI(root)
     root.mainloop()
+
+if __name__ == "__main__":
+    main()

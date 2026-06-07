@@ -330,7 +330,10 @@ class Game2048:
         self.root.bind("<Key>", self.handle_keypress)
 
 
-if __name__ == "__main__":
+def main():
     root = tk.Tk()
     game = Game2048(root)
     root.mainloop()
+
+if __name__ == "__main__":
+    main()

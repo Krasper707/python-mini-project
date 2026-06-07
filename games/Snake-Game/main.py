@@ -162,9 +162,12 @@ class SnakeGame:
         self.screen.mainloop()
 
 
-if __name__ == "__main__":
+def main():
     game = SnakeGame()
     try:
-        game.run()
+    game.run()
     except turtle.Terminator:
-        pass
+    pass
+
+if __name__ == "__main__":
+    main()
