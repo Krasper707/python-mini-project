@@ -18,14 +18,14 @@ def main():
             eat_sound = pygame.mixer.Sound("sounds/eat.wav")
             gameover_sound = pygame.mixer.Sound("sounds/gameover.wav")
             pygame_installed = True
-        except Exception:
+        except (pygame.error, FileNotFoundError, OSError) as e:
             # Fallback to alternate mp3 file naming schemes
             try:
                 eat_sound = pygame.mixer.Sound("sounds/Apple_Eating.mp3")
                 gameover_sound = pygame.mixer.Sound("sounds/Game_over.mp3")
                 pygame_installed = True
-            except Exception:
-                print("⚠️ Warning: Sound files not found in 'sounds/' folder. Game will run silently.")
+            except (pygame.error, FileNotFoundError, OSError) as e2:
+                print(f"⚠️ Warning: Sound files not found or could not be loaded: {e2}")
                 pygame_installed = False
     except ImportError:
         print("⚠️ Warning: pygame module not found. Game will run without sound effects.")

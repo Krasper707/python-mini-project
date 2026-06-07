@@ -112,9 +112,9 @@ def main():
             if score > high_score:
                 high_score = score
                 try:
-                    with open(highscore_path, "w") as file:
+                    with open(highscore_path, "w", encoding="utf-8") as file:
                         file.write(str(high_score))
-                except Exception as e:
+                except OSError as e:
                     print(f"⚠️ Warning: Could not save high score: {e}")
 
         if not inside(bird):

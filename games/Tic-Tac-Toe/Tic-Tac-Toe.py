@@ -31,14 +31,18 @@ def main():
     # ── Fonts ─────────────────────────────────────────────────
     def sf(size, bold=False):
         for n in ["Segoe UI", "Helvetica Neue", "Arial", "DejaVu Sans"]:
-            try: return pygame.font.SysFont(n, size, bold=bold)
-            except: pass
+            try:
+                return pygame.font.SysFont(n, size, bold=bold)
+            except pygame.error:
+                pass
         return pygame.font.Font(None, size)
 
     def mf(size, bold=False):
         for n in ["Consolas", "Courier New", "DejaVu Sans Mono"]:
-            try: return pygame.font.SysFont(n, size, bold=bold)
-            except: pass
+            try:
+                return pygame.font.SysFont(n, size, bold=bold)
+            except pygame.error:
+                pass
         return pygame.font.Font(None, size)
 
     F_TAG    = sf(14, bold=True)

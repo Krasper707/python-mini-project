@@ -104,7 +104,7 @@ class Game2048:
     def save_high_score(self):
         try:
             HIGH_SCORE_PATH.write_text(str(self.high_score))
-        except Exception as e:
+        except OSError as e:
             print(f"Warning: Could not save high score: {e}")
 
     def create_grid(self):

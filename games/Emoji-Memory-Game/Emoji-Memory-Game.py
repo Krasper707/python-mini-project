@@ -10,16 +10,17 @@ def main():
     # Load or initialize high score ONCE at the start of the program
     if not os.path.exists(HIGH_SCORE_FILE):
         try:
-            with open(HIGH_SCORE_FILE, "w") as file:
+            with open(HIGH_SCORE_FILE, "w", encoding="utf-8") as file:
                 file.write("0")
-        except Exception:
-            pass
+        except OSError as e:
+            print(f"⚠️ Warning: Could not initialize high score file: {e}")
 
     high_score = 0
     try:
-        with open(HIGH_SCORE_FILE, "r") as file:
+        with open(HIGH_SCORE_FILE, "r", encoding="utf-8") as file:
             high_score = int(file.read().strip() or "0")
-    except Exception:
+    except (FileNotFoundError, ValueError, OSError) as e:
+        print(f"⚠️ Warning: Could not read high score file: {e}")
         high_score = 0
 
     # Main Game Loop
@@ -90,10 +91,10 @@ def main():
             print("🔥 NEW HIGH SCORE!")
             high_score = score  # Update local memory variable
             try:
-                with open(HIGH_SCORE_FILE, "w") as file:
+                with open(HIGH_SCORE_FILE, "w", encoding="utf-8") as file:
                     file.write(str(score))
-            except Exception:
-                print("⚠️ Could not save high score.")
+            except OSError as e:
+                print(f"⚠️ Could not save high score: {e}")
         else:
             print(f"🏅 High Score remains: {high_score}")
 
